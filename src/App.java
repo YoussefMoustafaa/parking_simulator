@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 class ParkingLot {
     static int occupiedSpots = 0;
     static List<Gate> gates = new ArrayList<>();
+    static PriorityQueue<Car> waitingQueue = new PriorityQueue<>(Comparator.comparingInt(car -> car.arriveTime));
 }
 
 
@@ -19,7 +22,7 @@ public class App {
         // Start all car threads
         for(Car car : carsList) {
             car.start();
-            Thread.sleep(100);
+            Thread.sleep(50);
         }
         
         // Wait for all cars to finish

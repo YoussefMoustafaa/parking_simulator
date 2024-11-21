@@ -1,4 +1,4 @@
-class Gate {
+class Gate extends Thread {
     int countCars = 0;
     
     public void printStats(int gateNumber) {

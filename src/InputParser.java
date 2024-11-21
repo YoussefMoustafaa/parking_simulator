@@ -3,12 +3,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 public class InputParser {
     public static List<Car> readCars(String fileName) {
         List<Car> cars = new ArrayList<>();
-        Semaphore semaphore = new Semaphore(4); // 4 parking spots available
+        CustomSemaphore sem = new CustomSemaphore(4);
+        // Semaphore semaphore = new Semaphore(4); // 4 parking spots available
 
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -20,7 +20,7 @@ public class InputParser {
                 int parkTime = Integer.parseInt(parts[3].split(" ")[1]);
 
                 // Create a Car object
-                Car car = new Car(semaphore, carName, gateNumber, parkTime, arriveTime);
+                Car car = new Car(sem, carName, gateNumber, parkTime, arriveTime);
                 cars.add(car);
             }
         } catch (IOException e) {

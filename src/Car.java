@@ -1,22 +1,18 @@
-import java.util.concurrent.Semaphore;
 
 class Car extends Thread {
-    Semaphore sem;
+    CustomSemaphore sem;
     String carName;
     int gateNumber;
     int parkTime;
     int arriveTime;
 
-    private long waitTime;
-
-    public Car(Semaphore sem ,String carName,int gateNumber , int parkTime , int arriveTime){
+    public Car(CustomSemaphore sem ,String carName,int gateNumber , int parkTime , int arriveTime){
         super(carName);
         this.sem = sem;
         this.carName = carName;
         this.gateNumber = gateNumber;
         this.parkTime = parkTime;
         this.arriveTime=arriveTime;
-        this.waitTime = 0;
     }
 
     public void run() {
@@ -27,35 +23,40 @@ class Car extends Thread {
             ParkingLot.gates.get(gateNumber-1).countCars++;
 
             long waitStartTime = 0;            
+            waitStartTime = System.currentTimeMillis();
             
             synchronized (ParkingLot.class) {
+                System.out.println("Car " + carName + " from Gate " + gateNumber + " arrived at time " + arriveTime);
+                
                 if (ParkingLot.occupiedSpots >= 4) {
-                    waitStartTime = System.currentTimeMillis();
-                    System.out.println("Car " + carName + " from Gate " + gateNumber + " arrived at time " + arriveTime);
-                    while (ParkingLot.occupiedSpots >= 4) {
-                        System.out.println("Car " + carName + " from Gate " + gateNumber + " waiting for a spot");  
-                        ParkingLot.class.wait();
-                    }
-                }
+                    System.out.println("Car " + carName + " from Gate " + gateNumber + " waiting for a spot");  
+                    ParkingLot.waitingQueue.add(this);
 
-                this.waitTime = (System.currentTimeMillis() - waitStartTime) / 1000;
+                    while (ParkingLot.waitingQueue.peek() != this || ParkingLot.occupiedSpots >= 4)
+                        ParkingLot.class.wait();
+                    
+                    ParkingLot.waitingQueue.poll();
+                }
+                
+
+                int waitTime = (int) ((System.currentTimeMillis() - waitStartTime) / 1000);
                 System.out.println("waitTime: " + waitTime);
-                sem.acquire();
+                sem.aquire();
                 ParkingLot.occupiedSpots++;
                 if (waitTime > 0) {
-                    System.out.println("Car " + carName + " from Gate " + gateNumber + " after waiting for " + waitTime + " units of time. (Parking Status: " + (ParkingLot.occupiedSpots) + " spots occupied)");
+                    System.out.println("Car " + carName + " from Gate " + gateNumber + " parked after waiting for " + waitTime + " units of time. (Parking Status: " + (ParkingLot.occupiedSpots) + " spots occupied)");
                 } else {
                     System.out.println("Car " + carName + " from Gate " + gateNumber + " parked. (Parking Status: " + (ParkingLot.occupiedSpots) + " spots occupied)");
                 }
             }
 
-            sleep(parkTime * 1000);
+            sleep(parkTime * 1000 + 300);
 
             synchronized (ParkingLot.class) {
                 ParkingLot.occupiedSpots--;
                 sem.release();
                 System.out.println("Car " + carName + " from Gate " + gateNumber + " left after " + parkTime + " units of time. (Parking Status: " + ParkingLot.occupiedSpots + " spots occupied)");
-                ParkingLot.class.notify();
+                ParkingLot.class.notifyAll();
             }
 
 
