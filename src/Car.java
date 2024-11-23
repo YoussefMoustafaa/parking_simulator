@@ -15,12 +15,13 @@ class Car extends Thread {
         this.arriveTime=arriveTime;
     }
 
+    @Override
     public void run() {
         try {
             // the car waits until the arrive time
             Thread.sleep(arriveTime * 1000);
             
-            ParkingLot.gates.get(gateNumber-1).countCars++;
+            ParkingLot.gates.get(gateNumber-1).addCar();
 
             long waitStartTime = 0;            
             waitStartTime = System.currentTimeMillis();
@@ -40,8 +41,8 @@ class Car extends Thread {
                 
 
                 int waitTime = (int) ((System.currentTimeMillis() - waitStartTime) / 1000);
-                System.out.println("waitTime: " + waitTime);
-                sem.aquire();
+                // System.out.println("waitTime: " + waitTime);
+                sem.acquire();
                 ParkingLot.occupiedSpots++;
                 if (waitTime > 0) {
                     System.out.println("Car " + carName + " from Gate " + gateNumber + " parked after waiting for " + waitTime + " units of time. (Parking Status: " + (ParkingLot.occupiedSpots) + " spots occupied)");

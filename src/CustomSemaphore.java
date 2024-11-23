@@ -9,7 +9,7 @@ public class CustomSemaphore {
         this.value = initial;
     }
 
-    public synchronized void aquire() {
+    public synchronized void acquire() {
         this.value--;
         if (value < 0) {
             try {

@@ -13,9 +13,9 @@ class ParkingLot {
 public class App {
     public static void main(String[] args) throws Exception {
         // Initialize gates
-        ParkingLot.gates.add(new Gate());
-        ParkingLot.gates.add(new Gate());
-        ParkingLot.gates.add(new Gate());
+        for (int i = 0; i < 3; i++) {
+            ParkingLot.gates.add(new Gate());
+        }
         
         List<Car> carsList = InputParser.readCars("src/Cars.txt");
         
@@ -30,7 +30,9 @@ public class App {
             car.join();
         }
 
-        System.out.println("Total number of cars: " + carsList.size());
+        System.out.println("\nTotal Cars Served: " + carsList.size());
+        System.out.println("Current Cars in Parking: 0");
+        System.out.println("Details:");
         
         // Print final statistics
         for(Gate gate : ParkingLot.gates) {
