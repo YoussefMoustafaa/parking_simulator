@@ -21,28 +21,21 @@ class Car extends Thread {
             // the car waits until the arrive time
             Thread.sleep(arriveTime * 1000);
             
-            ParkingLot.gates.get(gateNumber-1).addCar();
-
             long waitStartTime = 0;            
             waitStartTime = System.currentTimeMillis();
             
+            System.out.println("Car " + carName + " from Gate " + gateNumber + " arrived at time " + arriveTime);
+            
+            if (ParkingLot.occupiedSpots >= 4) {
+                System.out.println("Car " + carName + " from Gate " + gateNumber + " waiting for a spot");  
+            }
+            
+            sem.acquire();
+            
+            ParkingLot.gates.get(gateNumber-1).addCar();  // add car to its gate
+            int waitTime = (int) ((System.currentTimeMillis() - waitStartTime) / 1000);
+
             synchronized (ParkingLot.class) {
-                System.out.println("Car " + carName + " from Gate " + gateNumber + " arrived at time " + arriveTime);
-                
-                if (ParkingLot.occupiedSpots >= 4) {
-                    System.out.println("Car " + carName + " from Gate " + gateNumber + " waiting for a spot");  
-                    ParkingLot.waitingQueue.add(this);
-
-                    while (ParkingLot.waitingQueue.peek() != this || ParkingLot.occupiedSpots >= 4)
-                        ParkingLot.class.wait();
-                    
-                    ParkingLot.waitingQueue.poll();
-                }
-                
-
-                int waitTime = (int) ((System.currentTimeMillis() - waitStartTime) / 1000);
-                // System.out.println("waitTime: " + waitTime);
-                sem.acquire();
                 ParkingLot.occupiedSpots++;
                 if (waitTime > 0) {
                     System.out.println("Car " + carName + " from Gate " + gateNumber + " parked after waiting for " + waitTime + " units of time. (Parking Status: " + (ParkingLot.occupiedSpots) + " spots occupied)");
@@ -55,10 +48,10 @@ class Car extends Thread {
 
             synchronized (ParkingLot.class) {
                 ParkingLot.occupiedSpots--;
-                sem.release();
                 System.out.println("Car " + carName + " from Gate " + gateNumber + " left after " + parkTime + " units of time. (Parking Status: " + ParkingLot.occupiedSpots + " spots occupied)");
-                ParkingLot.class.notifyAll();
             }
+            
+            sem.release();
 
 
         } catch (InterruptedException e) {
