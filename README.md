@@ -71,17 +71,9 @@ This project simulates a parking lot with multiple gates and limited parking spo
    cd parking-lot-simulation
    ```
 
-2. Compile the Java files:
-   ```bash
-   javac Car.java CustomSemaphore.java ParkingLot.java
-   ```
+2. Compile and Run
 
-3. Run the simulation:
-   ```bash
-   java ParkingLot
-   ```
-
-4. Observe the output logs in the console to see car activities.
+3. Observe the output logs in the console to see car activities.
 
 ---
 
